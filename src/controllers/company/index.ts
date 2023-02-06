@@ -2,23 +2,27 @@ import axios from "axios";
 import { Request, Response } from "express";
 import { body, validationResult } from 'express-validator';
 import { isCNPJ } from 'brazilian-values';
+import { Company } from "../../providers/Company";
 
 const controller = async (req: Request, res: Response) => {
     const { cnpj } = req.body;
     const errors = validationResult(req);
+
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
     }
 
     try {
-        const result = await axios.get(`https://www.receitaws.com.br/v1/cnpj/${cnpj}`)
+        const result = await axios.get(`https://www.receitaws.com.br/v1/cnpj/${cnpj}`);
+        const companyProvider = new Company();
+        const { nome: name } = result.data;
 
-        return res.status(201).json({
-            message: result.data,
-            success: true,
-            code: 201
-        });
+        const registered = await companyProvider.registerCompany({ cnpj, name })
+
+        return res.status(201).json(registered);
     } catch (err: any) {
+        console.log(`[COMPANY] - ${JSON.stringify(err, null, 2)}`);
+
         return res.status(400).json({
             message: "🚧Aguarde 1 minuto🚧",
             success: false,
