@@ -1,3 +1,4 @@
+import axios from "axios";
 import { db } from "../../db";
 import { TCompany } from "./types";
 
@@ -29,5 +30,11 @@ export class Company {
             success: false,
             code: 200
         }
+    }
+
+    async fetchCompany({ cnpj }: Pick<TCompany, 'cnpj'>): Promise<Partial<Pick<TCompany, 'name'>>> {
+        const result = await axios.get(`https://www.receitaws.com.br/v1/cnpj/${cnpj}`);
+
+        return { name: result.data.name }
     }
 }

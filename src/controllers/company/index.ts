@@ -13,9 +13,17 @@ const controller = async (req: Request, res: Response) => {
     }
 
     try {
-        const result = await axios.get(`https://www.receitaws.com.br/v1/cnpj/${cnpj}`);
         const companyProvider = new Company();
-        const { nome: name } = result.data;
+
+        const { name } = await companyProvider.fetchCompany({ cnpj })
+
+        if (!name) {
+            return res.status(400).json({
+                message: "[COMPANY] - CNPJ não encontrado na base de dados",
+                success: false,
+                code: 410
+            });
+        }
 
         const registered = await companyProvider.registerCompany({ cnpj, name })
 
