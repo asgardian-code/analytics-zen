@@ -24,7 +24,7 @@ const controller = async (req: Request, res: Response) => {
         console.log(`[COMPANY] - ${JSON.stringify(err, null, 2)}`);
 
         return res.status(400).json({
-            message: "🚧Aguarde 1 minuto🚧",
+            message: "[COMPANY] - 🚧Aguarde 1 minuto🚧",
             success: false,
             code: 410
         });
@@ -33,7 +33,13 @@ const controller = async (req: Request, res: Response) => {
 
 
 const validations = [
-    body('cnpj').isNumeric({ no_symbols: true }).isLength({ min: 14, max: 14 }).custom(isCNPJ),
+    body('cnpj')
+        .isNumeric({ no_symbols: true })
+        .withMessage('apenas números')
+        .isLength({ min: 14, max: 14 })
+        .withMessage('deve conter 14 characteres')
+        .custom(isCNPJ)
+        .withMessage('deve ser um cnpj válido'),
 ]
 
 export const company = [
